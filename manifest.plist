@@ -11,19 +11,19 @@
                     <key>kind</key>
                     <string>software-package</string>
                     <key>url</key>
-                    <string>رابط_ملف_الـ_IPA_هنا</string>
+                    <string>https://download1474.mediafire.com/bahf8kbkl9mg3JmkjyMav8_p4bWiGu4Ipv5-squHLXuRN2MLEhgqTAudN-y3sRmE9KrxaSwVNtZUneS-XKqvKHuy1RMg2njUc7bzqnUe_oA0f1vZ8EVEN_eb16iZL22xe4Oti0pvSXWCiaj-5E1pYVVKgE3x4CokIjTVl9bOM-BE/ppw88kdnymndabl/Jodel_JkoStore.ipa</string>
                 </dict>
             </array>
             <key>metadata</key>
             <dict>
                 <key>bundle-identifier</key>
-                <string>com.soul.snapchat</string>
+                <string>com.soul.jodel</string>
                 <key>bundle-version</key>
                 <string>1.0</string>
                 <key>kind</key>
                 <string>software</string>
                 <key>title</key>
-                <string>Snapchat Plus By SOUL</string>
+                <string>Jodel Plus By SOUL</string>
             </dict>
         </dict>
     </array>
