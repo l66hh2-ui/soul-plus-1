@@ -2,49 +2,92 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOUL PLUS - UNSTOPPABLE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>SOUL PLUS | متجر التطبيقات الشامل</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <style>
-        body { background: #0a192f; color: white; font-family: sans-serif; padding: 20px; }
-        .app-card { background: #112240; border-radius: 15px; padding: 15px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; border: 1px solid #233554; }
-        .btn { background: #64ffda; color: #0a192f; padding: 10px 15px; border-radius: 15px; font-weight: bold; cursor: pointer; border: none; }
-        #loader { color: #64ffda; font-weight: bold; margin-bottom: 20px; }
+        :root { --bg: #0a192f; --card: #112240; --accent: #64ffda; --text: #ccd6f6; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, system-ui, sans-serif; margin: 0; padding: 20px; }
+        
+        header { text-align: center; padding: 30px 0; border-bottom: 1px solid #233554; margin-bottom: 20px; }
+        header h1 { color: #fff; margin: 0; font-size: 28px; letter-spacing: 2px; }
+        header p { color: var(--accent); font-size: 14px; margin-top: 5px; }
+
+        .search-box { margin-bottom: 25px; }
+        .search-box input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #233554; background: var(--card); color: white; outline: none; box-sizing: border-box; }
+
+        .app-grid { display: grid; gap: 12px; max-width: 600px; margin: auto; }
+        .app-card { background: var(--card); border-radius: 18px; padding: 15px; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid var(--accent); transition: 0.2s; }
+        .app-card:active { transform: scale(0.97); }
+        
+        .app-info { display: flex; align-items: center; gap: 15px; text-align: right; }
+        .app-icon { width: 60px; height: 60px; border-radius: 14px; object-fit: cover; background: #0a192f; }
+        .app-name { font-weight: bold; font-size: 17px; color: #fff; display: block; }
+        .app-cat { font-size: 11px; color: var(--accent); background: rgba(100,255,218,0.1); padding: 2px 8px; border-radius: 10px; margin-top: 4px; display: inline-block; }
+
+        .btn-install { background: var(--accent); color: #0a192f; padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 14px; transition: 0.3s; }
+        .btn-install:hover { opacity: 0.8; }
     </style>
 </head>
 <body>
 
-    <h1>SOUL PLUS AUTO</h1>
-    <div id="loader">🚀 جاري كسر الحماية وجلب التطبيقات...</div>
-    <div id="list"></div>
+<header>
+    <h1>SOUL PLUS</h1>
+    <p>ألعاب • سوشيال ميديا • بلس</p>
+</header>
 
-    <script>
-        // المصدر اللي بنسحب منه
-        const target = "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/data.json";
+<div class="search-box">
+    <input type="text" id="searchInput" placeholder="ابحث عن تطبيق أو لعبة..." oninput="search()">
+</div>
 
-        async function fetchApps() {
-            try {
-                // استخدام وسيط لكسر الحماية (CORS Bridge)
-                const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(target)}`);
-                const data = await res.json();
-                const content = JSON.parse(data.contents);
-                
-                const list = document.getElementById('list');
-                document.getElementById('loader').innerText = "✅ تم الجلب بنجاح!";
+<div class="app-grid" id="appList">
+    </div>
 
-                list.innerHTML = content.apps.map(app => `
-                    <div class="app-card">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <img src="${app.icon}" width="50" style="border-radius:10px;">
-                            <div style="text-align:right"><b>${app.name}</b></div>
-                        </div>
-                        <button class="btn" onclick="window.location.href='itms-services://?action=download-manifest&url=${app.plist}'">تثبيت</button>
+<script>
+    // قائمة التطبيقات الضخمة (مدمجة لضمان التشغيل)
+    const apps = [
+        { name: "سناب شات بلس", cat: "تواصل", icon: "https://upload.wikimedia.org/wikipedia/en/thumb/c/c4/Snapchat_logo.svg/512px-Snapchat_logo.svg.png", plist: "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/plists/snapchat.plist" },
+        { name: "تيك توك بلس", cat: "تواصل", icon: "https://cdn4.iconfinder.com/data/icons/social-media-flat-7/64/Social-media_Tiktok-512.png", plist: "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/plists/tiktok.plist" },
+        { name: "يوتيوب بلس", cat: "ترفيه", icon: "https://upload.wikimedia.org/wikipedia/commons/ef/ef/Youtube_logo.png", plist: "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/plists/youtube.plist" },
+        { name: "ماين كرافت", cat: "ألعاب", icon: "https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png", plist: "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/plists/minecraft.plist" },
+        { name: "واتساب الذهبي", cat: "تواصل", icon: "https://p.kindpng.com/picc/s/153-1530335_gold-whatsapp-icon-png-transparent-png.png", plist: "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/plists/whatsapp.plist" },
+        { name: "كلاش اوف كلانس", cat: "ألعاب", icon: "https://is1-ssl.mzstatic.com/image/thumb/Purple122/v4/91/91/91/91919191-9191-9191-9191-919191919191/AppIcon-0-0-1x_U007emarketing-0-0-0-7-0-0-sRGB-0-0-0-GLES2_U002c0-512.png", plist: "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/plists/clash.plist" },
+        { name: "انستقرام بلس", cat: "تواصل", icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Instagram_logo_2016.svg/2048px-Instagram_logo_2016.svg.png", plist: "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/plists/instagram.plist" },
+        { name: "ببجي موبايل", cat: "ألعاب", icon: "https://is1-ssl.mzstatic.com/image/thumb/Purple112/v4/64/64/64/64646464-6464-6464-6464-646464646464/AppIcon-0-0-1x_U007emarketing-0-0-0-7-0-0-sRGB-0-0-0-GLES2_U002c0-512.png", plist: "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/plists/pubg.plist" },
+        { name: "يودل بلس", cat: "تواصل", icon: "https://is1-ssl.mzstatic.com/image/thumb/Purple122/v4/31/31/61/31316109-f865-685b-e44b-48763567d268/AppIcon-512x512bb.jpg", plist: "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/plists/jodel.plist" },
+        { name: "GTA: SA", cat: "ألعاب", icon: "https://is1-ssl.mzstatic.com/image/thumb/Purple122/v4/05/05/05/05050505-0505-0505-0505-050505050505/AppIcon-0-0-1x_U007emarketing-0-0-0-7-0-0-sRGB-0-0-0-GLES2_U002c0-512.png", plist: "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/plists/gta.plist" }
+    ];
+
+    function renderApps(data) {
+        const list = document.getElementById('appList');
+        list.innerHTML = data.map(app => `
+            <div class="app-card">
+                <div class="app-info">
+                    <img src="${app.icon}" class="app-icon" onerror="this.src='https://via.placeholder.com/60'">
+                    <div>
+                        <span class="app-name">${app.name}</span>
+                        <span class="app-cat">${app.cat}</span>
                     </div>
-                `).join('');
-            } catch (e) {
-                document.getElementById('loader').innerText = "❌ اقطع الشك باليقين، تأكد إنك فاتح من سفاري وجرب تحدث الصفحة.";
-            }
-        }
-        fetchApps();
-    </script>
+                </div>
+                <a href="itms-services://?action=download-manifest&url=${app.plist}" 
+                   class="btn-install" 
+                   onclick="alert('سيتم البدء في التثبيت.. تأكد من استخدام متصفح سفاري')">تثبيت</a>
+            </div>
+        `).join('');
+    }
+
+    function search() {
+        const term = document.getElementById('searchInput').value.toLowerCase();
+        const filtered = apps.filter(a => a.name.toLowerCase().includes(term));
+        renderApps(filtered);
+    }
+
+    // تشغيل العرض عند فتح الصفحة
+    renderApps(apps);
+</script>
+
 </body>
 </html>
