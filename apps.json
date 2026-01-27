@@ -1,4 +1,5 @@
-{
+[
+  {
     "name": "سناب شات بلس",
     "desc": "إصدار v12.10 - تخطي الحظر",
     "icon": "https://upload.wikimedia.org/wikipedia/en/thumb/c/c4/Snapchat_logo.svg/512px-Snapchat_logo.svg.png",
@@ -9,10 +10,5 @@
     "desc": "تخطي الحظر بالكامل",
     "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple122/v4/31/31/61/31316109-f865-685b-e44b-48763567d268/AppIcon-512x512bb.jpg",
     "plist": "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/plists/jodel.plist"
-  },
-  {
-    "name": "تيك توك بلس",
-    "desc": "حفظ بدون علامة مائية",
-    "icon": "https://cdn4.iconfinder.com/data/icons/social-media-flat-7/64/Social-media_Tiktok-512.png",
-    "plist": "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/plists/tiktok.plist"
   }
+]
