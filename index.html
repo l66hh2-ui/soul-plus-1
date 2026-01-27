@@ -2,73 +2,49 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>SOUL PLUS - AUTO MASTER</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOUL PLUS - UNSTOPPABLE</title>
     <style>
-        :root { --bg: #0a192f; --card: #112240; --accent: #64ffda; }
-        body { background: var(--bg); color: white; font-family: -apple-system, sans-serif; margin: 0; padding: 20px; text-align: center; }
-        .app-card { background: var(--card); border-radius: 18px; padding: 15px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border: 1px solid #233554; }
-        .app-img { width: 55px; height: 55px; border-radius: 12px; }
-        .btn { background: var(--accent); color: #0a192f; padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 14px; cursor: pointer; border: none; }
-        #status { color: var(--accent); margin-bottom: 20px; font-size: 14px; }
+        body { background: #0a192f; color: white; font-family: sans-serif; padding: 20px; }
+        .app-card { background: #112240; border-radius: 15px; padding: 15px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; border: 1px solid #233554; }
+        .btn { background: #64ffda; color: #0a192f; padding: 10px 15px; border-radius: 15px; font-weight: bold; cursor: pointer; border: none; }
+        #loader { color: #64ffda; font-weight: bold; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1 style="color:#fff; margin-bottom:5px;">SOUL PLUS</h1>
-        <div id="status">⏳ جاري سحب أحدث التطبيقات...</div>
-    </header>
-
-    <div id="masterList"></div>
+    <h1>SOUL PLUS AUTO</h1>
+    <div id="loader">🚀 جاري كسر الحماية وجلب التطبيقات...</div>
+    <div id="list"></div>
 
     <script>
-        // مصادر تطبيقات بلس عالمية وعربية محدثة
-        const SOURCES = [
-            "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/data.json",
-            "https://raw.githubusercontent.com/swaggyP1/P1-Repo/main/apps.json"
-        ];
+        // المصدر اللي بنسحب منه
+        const target = "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/data.json";
 
-        async function autoFetch() {
-            const list = document.getElementById('masterList');
-            const status = document.getElementById('status');
-            let allApps = [];
+        async function fetchApps() {
+            try {
+                // استخدام وسيط لكسر الحماية (CORS Bridge)
+                const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(target)}`);
+                const data = await res.json();
+                const content = JSON.parse(data.contents);
+                
+                const list = document.getElementById('list');
+                document.getElementById('loader').innerText = "✅ تم الجلب بنجاح!";
 
-            for (let url of SOURCES) {
-                try {
-                    const res = await fetch(url);
-                    const data = await res.json();
-                    const apps = data.apps || data;
-                    allApps = allApps.concat(apps);
-                } catch (e) { console.log("مصدر معطل، جاري التخطي..."); }
-            }
-
-            if (allApps.length > 0) {
-                status.innerText = `✅ تم جلب ${allApps.length} تطبيق بنجاح!`;
-                list.innerHTML = allApps.map(app => `
+                list.innerHTML = content.apps.map(app => `
                     <div class="app-card">
-                        <div style="display:flex; align-items:center; gap:12px;">
-                            <img src="${app.icon}" class="app-img" onerror="this.src='https://l66hh2-ui.github.io/soul-plus-1/soul-icon.png'">
-                            <div style="text-align:right">
-                                <b style="display:block; font-size:16px;">${app.name}</b>
-                                <small style="color:#8892b0">تحديث تلقائي</small>
-                            </div>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <img src="${app.icon}" width="50" style="border-radius:10px;">
+                            <div style="text-align:right"><b>${app.name}</b></div>
                         </div>
-                        <button class="btn" onclick="install('${app.plist}')">تثبيت</button>
+                        <button class="btn" onclick="window.location.href='itms-services://?action=download-manifest&url=${app.plist}'">تثبيت</button>
                     </div>
                 `).join('');
-            } else {
-                status.innerText = "❌ فشل الجلب، جرب تحديث الصفحة";
+            } catch (e) {
+                document.getElementById('loader').innerText = "❌ اقطع الشك باليقين، تأكد إنك فاتح من سفاري وجرب تحدث الصفحة.";
             }
         }
-
-        function install(plistUrl) {
-            // حل مشكلة الزر: فتح الرابط بطريقة مباشرة يفهمها الأيفون
-            window.location.href = "itms-services://?action=download-manifest&url=" + plistUrl;
-        }
-
-        // تشغيل الجلب التلقائي فوراً
-        autoFetch();
+        fetchApps();
     </script>
 </body>
 </html>
