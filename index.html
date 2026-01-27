@@ -3,53 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOUL PLUS - AUTO SOURCE</title>
+    <title>SOUL PLUS STORE</title>
     <style>
-        :root { --bg: #0a192f; --card: #112240; --accent: #64ffda; }
-        body { background: var(--bg); color: white; font-family: sans-serif; text-align: center; padding: 20px; }
-        .app-card { background: var(--card); border-radius: 15px; padding: 15px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border: 1px solid #233554; }
-        .btn { background: var(--accent); color: #0a192f; padding: 10px 20px; border-radius: 20px; font-weight: bold; text-decoration: none; font-size: 13px; }
-        #status { color: var(--accent); font-size: 14px; margin-bottom: 20px; }
+        body { background: #0a192f; color: white; font-family: -apple-system, sans-serif; text-align: center; padding: 20px; }
+        .app-card { background: #112240; padding: 15px; border-radius: 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; border: 1px solid #233554; }
+        .btn { background: #64ffda; color: #0a192f; padding: 12px 20px; border-radius: 20px; font-weight: bold; text-decoration: none; font-size: 14px; cursor: pointer; border: none; }
+        #list { max-width: 500px; margin: auto; }
     </style>
 </head>
 <body>
-
-    <h1>متجر SOUL PLUS المطور</h1>
-    <div id="status">⏳ جاري فحص الشهادات وجلب التطبيقات...</div>
-    <div id="list"></div>
+    <h1>متجر SOUL PLUS</h1>
+    <div id="list">⏳ جاري عرض التطبيقات...</div>
 
     <script>
-        // مصفوفة المصادر العالمية الموقعة
-        const sources = [
-            "https://api.allorigins.win/get?url=" + encodeURIComponent("https://raw.githubusercontent.com/swaggyP1/P1-Repo/main/apps.json")
+        // مصفوفة تطبيقات بلس روابطها شغالة حالياً
+        const myApps = [
+            { "name": "Scarlet", "icon": "https://usescarlet.com/apple-touch-icon.png", "plist": "https://usescarlet.com/install.plist" },
+            { "name": "ESign", "icon": "https://esign.yyyue.xyz/ESign.png", "plist": "https://esign.yyyue.xyz/install.plist" },
+            { "name": "يوتيوب بلس", "icon": "https://upload.wikimedia.org/wikipedia/commons/ef/ef/Youtube_logo.png", "plist": "https://raw.githubusercontent.com/swaggyP1/P1-Repo/main/plists/youtube.plist" },
+            { "name": "سناب شات بلس", "icon": "https://upload.wikimedia.org/wikipedia/en/thumb/c/c4/Snapchat_logo.svg/512px-Snapchat_logo.svg.png", "plist": "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/plists/snapchat.plist" }
         ];
 
-        async function fetchApps() {
+        function showApps() {
             const list = document.getElementById('list');
-            try {
-                const response = await fetch(sources[0]);
-                const data = await response.json();
-                const content = JSON.parse(data.contents);
-                
-                document.getElementById('status').innerText = "✅ تم تحديث الشهادات بنجاح";
-                
-                list.innerHTML = content.map(app => `
-                    <div class="app-card">
-                        <div style="display:flex; align-items:center; gap:12px;">
-                            <img src="${app.icon}" width="50" style="border-radius:10px;" onerror="this.src='soul-icon.png'">
-                            <div style="text-align:right">
-                                <b>${app.name}</b><br>
-                                <small style="color:#8892b0">نسخة موقعة جاهزة</small>
-                            </div>
-                        </div>
-                        <a href="itms-services://?action=download-manifest&url=${app.plist}" class="btn">تثبيت</a>
+            list.innerHTML = myApps.map(app => `
+                <div class="app-card">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <img src="${app.icon}" width="55" style="border-radius:12px;" onerror="this.src='soul-icon.png'">
+                        <div style="text-align:right"><b>${app.name}</b></div>
                     </div>
-                `).join('');
-            } catch (e) {
-                document.getElementById('status').innerText = "❌ فشل التحديث التلقائي، جرب لاحقاً";
-            }
+                    <button onclick="window.location.href='itms-services://?action=download-manifest&url=${app.plist}'" class="btn">تثبيت</button>
+                </div>
+            `).join('');
         }
-        fetchApps();
+        
+        // تشغيل العرض فوراً
+        showApps();
     </script>
 </body>
 </html>
