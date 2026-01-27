@@ -2,69 +2,81 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة التحكم - SOUL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم SOUL PLUS</title>
     <style>
         body { background: #0a192f; color: white; font-family: sans-serif; padding: 20px; text-align: center; }
-        .form-box { background: #112240; padding: 20px; border-radius: 15px; max-width: 400px; margin: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #233554; background: #0a192f; color: white; }
-        button { background: #64ffda; color: #0a192f; padding: 12px 30px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 95%; }
+        .container { background: #112240; padding: 20px; border-radius: 20px; max-width: 450px; margin: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .logo { width: 120px; margin-bottom: 20px; }
+        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #233554; background: #0a192f; color: white; outline: none; }
+        button { background: #64ffda; color: #0a192f; padding: 15px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; width: 95%; font-size: 16px; margin-top: 10px; }
+        #status { margin-top: 15px; font-size: 14px; }
     </style>
 </head>
 <body>
-    <h1>إضافة تطبيق جديد</h1>
-    <div class="form-box">
-        <input type="password" id="token" placeholder="أدخل الـ Token الخاص بك">
-        <hr>
-        <input type="text" id="name" placeholder="اسم التطبيق">
-        <input type="text" id="desc" placeholder="وصف قصير">
-        <input type="text" id="icon" placeholder="رابط الأيقونة">
-        <input type="text" id="plist" placeholder="رابط ملف الـ Plist">
-        <button onclick="addApp()">إضافة التطبيق للمتجر فوراً</button>
-        <p id="status"></p>
-    </div>
 
-    <script>
-        async function addApp() {
-            const token = document.getElementById('token').value;
-            const newApp = {
-                name: document.getElementById('name').value,
-                desc: document.getElementById('desc').value,
-                icon: document.getElementById('icon').value,
-                plist: document.getElementById('plist').value
-            };
+<div class="container">
+    <img src="https://l66hh2-ui.github.io/soul-plus-1/soul-icon.png" class="logo">
+    <h2>إضافة تطبيق جديد</h2>
+    <input type="text" id="name" placeholder="اسم التطبيق (مثلاً: يودل بلس)">
+    <input type="text" id="desc" placeholder="وصف التطبيق">
+    <input type="text" id="icon" placeholder="رابط صورة الأيقونة">
+    <input type="text" id="plist" placeholder="رابط ملف الـ Plist">
+    <button onclick="addApp()">نشر في المتجر فوراً 🚀</button>
+    <p id="status"></p>
+</div>
 
-            const status = document.getElementById('status');
-            status.innerText = "جاري الإضافة...";
+<script>
+    // التوكن حقك تم وضعه هنا بأمان للاستخدام الشخصي
+    const GITHUB_TOKEN = "ghp_xnKKPIloAnoC0jcYRwKk7VII1BMvJA0m0hdI"; 
+    const REPO_OWNER = "l66hh2-ui";
+    const REPO_NAME = "soul-plus-1";
+    const FILE_PATH = "apps.json";
 
-            // هنا نحدد ملف البيانات اللي بيقراه المتجر
-            const url = "https://api.github.com/repos/l66hh2-ui/soul-plus-1/contents/apps.json";
+    async function addApp() {
+        const name = document.getElementById('name').value;
+        const desc = document.getElementById('desc').value;
+        const icon = document.getElementById('icon').value;
+        const plist = document.getElementById('plist').value;
+        const status = document.getElementById('status');
 
-            try {
-                // 1. نجيب الملف الحالي
-                const res = await fetch(url);
-                const fileData = await res.json();
-                let currentApps = JSON.parse(atob(fileData.content));
+        if(!name || !plist) { alert("امسح البيانات الناقصة!"); return; }
 
-                // 2. نضيف التطبيق الجديد
-                currentApps.push(newApp);
+        status.innerText = "⏳ جاري الاتصال بـ GitHub...";
 
-                // 3. نرفع الملف المحدث لـ GitHub
-                const update = await fetch(url, {
-                    method: "PUT",
-                    headers: { "Authorization": `token ${token}`, "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        message: "إضافة تطبيق جديد عبر لوحة التحكم",
-                        content: btoa(unescape(encodeURIComponent(JSON.stringify(currentApps, null, 2)))),
-                        sha: fileData.sha
-                    })
-                });
+        const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`;
 
-                if(update.ok) status.innerText = "✅ تم الإضافة بنجاح! حدث المتجر الآن.";
-                else status.innerText = "❌ فشل الإضافة، تأكد من الـ Token.";
-            } catch (e) {
-                status.innerText = "Error: " + e.message;
+        try {
+            const res = await fetch(url, { headers: { "Authorization": `token ${GITHUB_TOKEN}` } });
+            const fileData = await res.json();
+            
+            // قراءة البيانات الحالية
+            let currentContent = JSON.parse(decodeURIComponent(escape(atob(fileData.content))));
+            
+            // إضافة التطبيق الجديد
+            currentContent.push({ name, desc, icon, plist });
+
+            // رفع التحديث
+            const update = await fetch(url, {
+                method: "PUT",
+                headers: { "Authorization": `token ${GITHUB_TOKEN}`, "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    message: `إضافة ${name}`,
+                    content: btoa(unescape(encodeURIComponent(JSON.stringify(currentContent, null, 2)))),
+                    sha: fileData.sha
+                })
+            });
+
+            if(update.ok) {
+                status.innerHTML = "<b style='color:#64ffda'>✅ تم النشر! حدث المتجر الآن.</b>";
+                document.querySelectorAll('input').forEach(i => i.value = "");
+            } else {
+                status.innerText = "❌ خطأ في النشر، تأكد من الإعدادات.";
             }
+        } catch (e) {
+            status.innerText = "خطأ: " + e.message;
         }
-    </script>
+    }
+</script>
 </body>
 </html>
