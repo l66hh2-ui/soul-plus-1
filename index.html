@@ -2,88 +2,69 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>SOUL PLUS STORE</title>
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="https://l66hh2-ui.github.io/soul-plus-1/soul-icon.png">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>SOUL PLUS - AUTO MODE</title>
     <style>
-        :root { --bg: #0a192f; --card: #112240; --accent: #64ffda; --text: #ccd6f6; }
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 20px; }
-        header { text-align: center; padding: 30px 0; }
-        .logo { width: 100px; margin-bottom: 10px; }
-        h1 { font-size: 24px; color: #fff; margin: 0; }
-        
-        .search-bar { width: 100%; padding: 15px; border-radius: 12px; border: none; background: var(--card); color: white; margin-bottom: 20px; box-sizing: border-box; }
-        
-        .app-list { display: flex; flex-direction: column; gap: 15px; }
-        .app-item { background: var(--card); border-radius: 18px; padding: 15px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        :root { --bg: #0a192f; --card: #172a45; --accent: #64ffda; }
+        body { background: var(--bg); color: white; font-family: -apple-system, sans-serif; margin: 0; padding: 20px; }
+        header { text-align: center; padding: 20px 0; }
+        .app-grid { display: grid; gap: 12px; max-width: 600px; margin: auto; }
+        .app-card { background: var(--card); border-radius: 18px; padding: 12px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #233554; }
         .app-info { display: flex; align-items: center; gap: 12px; }
-        .app-icon { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; }
-        .app-name { font-weight: bold; font-size: 16px; color: #fff; display: block; }
-        .app-desc { font-size: 12px; color: #8892b0; }
-        
-        .install-btn { background: transparent; color: var(--accent); padding: 6px 18px; border-radius: 20px; text-decoration: none; font-weight: bold; border: 1px solid var(--accent); font-size: 14px; }
-        .install-btn:active { background: var(--accent); color: var(--bg); }
+        .app-icon { width: 55px; height: 55px; border-radius: 12px; background: #0a192f; }
+        .install-btn { background: var(--accent); color: #0a192f; padding: 7px 18px; border-radius: 15px; text-decoration: none; font-weight: bold; font-size: 14px; }
+        .source-tag { font-size: 10px; color: var(--accent); opacity: 0.7; }
     </style>
 </head>
 <body>
 
 <header>
-    <img src="https://l66hh2-ui.github.io/soul-plus-1/soul-icon.png" class="logo">
-    <h1>SOUL PLUS STORE</h1>
+    <h1 style="margin-bottom:5px;">SOUL PLUS</h1>
+    <p style="font-size:12px; color:#8892b0;">تحديث آلي من السيرفرات العالمية</p>
 </header>
 
-<input type="text" class="search-bar" id="searchInput" placeholder="ابحث عن تطبيق...">
-
-<div class="app-list" id="appList">
-    <p style="text-align:center;">جاري تحميل التطبيقات...</p>
+<div class="app-grid" id="masterList">
+    <p style="text-align:center;">جاري جلب مئات التطبيقات... انتظر ثواني</p>
 </div>
 
 <script>
-    async function loadApps() {
-        const url = "https://l66hh2-ui.github.io/soul-plus-1/apps.json?v=" + Math.random();
-        try {
-            const res = await fetch(url);
-            const apps = await res.json();
-            displayApps(apps);
-        } catch (e) {
-            document.getElementById('appList').innerHTML = "لا يوجد تطبيقات حالياً.";
+    // روابط المصادر اللي تسحب منها التطبيقات
+    const API_SOURCES = [
+        "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/data.json",
+        "https://raw.githubusercontent.com/swaggyP1/P1-Repo/main/apps.json"
+    ];
+
+    async function loadAllApps() {
+        const container = document.getElementById('masterList');
+        let htmlBuffer = "";
+
+        for (let url of API_SOURCES) {
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                // التأكد من الوصول لقائمة التطبيقات داخل الملف
+                const apps = data.apps || data; 
+
+                apps.forEach(app => {
+                    htmlBuffer += `
+                        <div class="app-card">
+                            <div class="app-info">
+                                <img src="${app.icon}" class="app-icon" onerror="this.src='soul-icon.png'">
+                                <div>
+                                    <div style="font-weight:bold; font-size:15px;">${app.name}</div>
+                                    <div class="source-tag">سيرفر خارجي • متوفر الآن</div>
+                                </div>
+                            </div>
+                            <a href="itms-services://?action=download-manifest&url=${app.plist}" class="install-btn">تثبيت</a>
+                        </div>`;
+                });
+            } catch (err) { console.error("فشل سحب مصدر:", url); }
         }
+        container.innerHTML = htmlBuffer || "تعذر جلب التطبيقات، تأكد من الاتصال.";
     }
 
-    function displayApps(apps) {
-        const container = document.getElementById('appList');
-        container.innerHTML = "";
-        apps.reverse().forEach(app => { // reverse عشان الجديد يظهر فوق
-            container.innerHTML += `
-                <div class="app-item">
-                    <div class="app-info">
-                        <img src="${app.icon}" class="app-icon">
-                        <div>
-                            <span class="app-name">${app.name}</span>
-                            <span class="app-desc">${app.desc}</span>
-                        </div>
-                    </div>
-                    <a href="itms-services://?action=download-manifest&url=${app.plist}" class="install-btn">تثبيت</a>
-                </div>
-            `;
-        });
-    }
-
-    document.getElementById('searchInput').oninput = function(e) {
-        const term = e.target.value.toLowerCase();
-        const items = document.querySelectorAll('.app-item');
-        items.forEach(item => {
-            const name = item.querySelector('.app-name').innerText.toLowerCase();
-            item.style.display = name.includes(term) ? "flex" : "none";
-        });
-    };
-
-    loadApps();
+    loadAllApps();
 </script>
-
 </body>
 </html>
