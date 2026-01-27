@@ -14,7 +14,7 @@
   {
     "name": "واتساب الذهبي",
     "icon": "https://p.kindpng.com/picc/s/153-1530335_gold-whatsapp-icon-png-transparent-png.png",
-    "desc": "ميزات ذهبية حصرية",
+    "desc": "ميزات حصرية وإخفاء الظهور",
     "plist": "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/plists/whatsapp.plist"
   },
   {
@@ -24,33 +24,27 @@
     "plist": "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/plists/instagram.plist"
   },
   {
-    "name": "يوتيوب بلس",
-    "icon": "https://upload.wikimedia.org/wikipedia/commons/ef/ef/Youtube_logo.png",
-    "desc": "بدون إعلانات - تشغيل خلفية",
-    "plist": "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/plists/youtube.plist"
-  },
-  {
     "name": "ماين كرافت",
     "icon": "https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png",
-    "desc": "اللعبة كاملة مجاناً",
+    "desc": "اللعبة كاملة - إصدار أخير",
     "plist": "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/plists/minecraft.plist"
   },
   {
-    "name": "كلاش اوف كلانس",
-    "icon": "https://play-lh.googleusercontent.com/LBy0Cc1W_1ZfC52A7sSAnY_ZlBXhR1gyALps966Yv_uF0S-f6TfC8B_Sjr6D2yA908M",
-    "desc": "نسخة مهكرة - موارد غير محدودة",
+    "name": "كلاش اوف كلانس مهكرة",
+    "icon": "https://static.wikia.nocookie.net/clashofclans/images/c/ca/Clash_of_Clans_App_Icon.png",
+    "desc": "موارد وجواهر غير محدودة",
     "plist": "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/plists/clash.plist"
   },
   {
-    "name": "لعبة Car Parking",
-    "icon": "https://play-lh.googleusercontent.com/6S3l0C0uE-7i2G_x3pD9Vp1XJ8J_Yp-f9-0A0D5L1Y8Z9D",
-    "desc": "مهكرة أموال غير محدودة",
+    "name": "Car Parking مهكرة",
+    "icon": "https://play-lh.googleusercontent.com/6D3pS_yN6E6S",
+    "desc": "أموال لا تنتهي",
     "plist": "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/plists/carparking.plist"
   },
   {
-    "name": "يودل بلس",
-    "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple122/v4/31/31/61/31316109-f865-685b-e44b-48763567d268/AppIcon-512x512bb.jpg",
-    "desc": "رفع من الاستوديو وتخطي الحظر",
-    "plist": "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/plists/jodel.plist"
+    "name": "يوتيوب بلس",
+    "icon": "https://upload.wikimedia.org/wikipedia/commons/ef/ef/Youtube_logo.png",
+    "desc": "بدون إعلانات وتنزيل مقاطع",
+    "plist": "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/plists/youtube.plist"
   }
 ]
