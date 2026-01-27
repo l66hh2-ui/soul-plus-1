@@ -2,80 +2,112 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم SOUL PLUS</title>
+    <title>لوحة تحكم SOUL PLUS | التثبيت التلقائي</title>
     <style>
         body { background: #0a192f; color: white; font-family: sans-serif; padding: 20px; text-align: center; }
-        .container { background: #112240; padding: 20px; border-radius: 20px; max-width: 450px; margin: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .logo { width: 120px; margin-bottom: 20px; }
-        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #233554; background: #0a192f; color: white; outline: none; }
-        button { background: #64ffda; color: #0a192f; padding: 15px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; width: 95%; font-size: 16px; margin-top: 10px; }
-        #status { margin-top: 15px; font-size: 14px; }
+        .box { background: #112240; padding: 25px; border-radius: 20px; max-width: 450px; margin: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #64ffda; }
+        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #233554; background: #0a192f; color: white; }
+        button { background: #64ffda; color: #0a192f; padding: 15px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; width: 95%; font-size: 16px; }
+        #log { margin-top: 15px; font-size: 13px; color: #8892b0; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <img src="https://l66hh2-ui.github.io/soul-plus-1/soul-icon.png" class="logo">
-    <h2>إضافة تطبيق جديد</h2>
-    <input type="text" id="name" placeholder="اسم التطبيق (مثلاً: يودل بلس)">
-    <input type="text" id="desc" placeholder="وصف التطبيق">
-    <input type="text" id="icon" placeholder="رابط صورة الأيقونة">
-    <input type="text" id="plist" placeholder="رابط ملف الـ Plist">
-    <button onclick="addApp()">نشر في المتجر فوراً 🚀</button>
-    <p id="status"></p>
+<div class="box">
+    <h2>إضافة تطبيق بملف Plist تلقائي</h2>
+    <input type="text" id="appName" placeholder="اسم التطبيق (مثال: يودل بلس)">
+    <input type="text" id="ipaName" placeholder="اسم ملف الـ IPA المرفوع (مثال: yodel.ipa)">
+    <input type="text" id="appBundle" placeholder="Identifier (مثال: com.soul.plus)">
+    <input type="text" id="appIcon" placeholder="رابط الأيقونة">
+    <button onclick="deployApp()">تجهيز ونشر التطبيق 🚀</button>
+    <div id="log"></div>
 </div>
 
 <script>
-    // التوكن حقك تم وضعه هنا بأمان للاستخدام الشخصي
-    const GITHUB_TOKEN = "ghp_xnKKPIloAnoC0jcYRwKk7VII1BMvJA0m0hdI"; 
-    const REPO_OWNER = "l66hh2-ui";
-    const REPO_NAME = "soul-plus-1";
-    const FILE_PATH = "apps.json";
+    const TOKEN = "ghp_xnKKPIloAnoC0jcYRwKk7VII1BMvJA0m0hdI";
+    const USER = "l66hh2-ui";
+    const REPO = "soul-plus-1";
 
-    async function addApp() {
-        const name = document.getElementById('name').value;
-        const desc = document.getElementById('desc').value;
-        const icon = document.getElementById('icon').value;
-        const plist = document.getElementById('plist').value;
-        const status = document.getElementById('status');
+    async function deployApp() {
+        const name = document.getElementById('appName').value;
+        const ipa = document.getElementById('ipaName').value;
+        const bundle = document.getElementById('appBundle').value;
+        const icon = document.getElementById('appIcon').value;
+        const log = document.getElementById('log');
 
-        if(!name || !plist) { alert("امسح البيانات الناقصة!"); return; }
+        const ipaURL = `https://l66hh2-ui.github.io/${REPO}/${ipa}`;
+        const plistName = `plists/${name.replace(/\s+/g, '')}.plist`;
+        const plistURL = `https://l66hh2-ui.github.io/${REPO}/${plistName}`;
 
-        status.innerText = "⏳ جاري الاتصال بـ GitHub...";
+        // 1. محتوى ملف الـ Plist
+        const plistContent = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>items</key>
+    <array>
+        <dict>
+            <key>assets</key>
+            <array>
+                <dict>
+                    <key>kind</key>
+                    <string>software-package</string>
+                    <key>url</key>
+                    <string>${ipaURL}</string>
+                </dict>
+            </array>
+            <key>metadata</key>
+            <dict>
+                <key>bundle-identifier</key>
+                <string>${bundle}</string>
+                <key>bundle-version</key>
+                <string>1.0</string>
+                <key>kind</key>
+                <string>software</string>
+                <key>title</key>
+                <string>${name}</string>
+            </dict>
+        </dict>
+    </array>
+</dict>
+</plist>`;
 
-        const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`;
+        log.innerText = "⏳ جاري إنشاء ملف الـ Plist...";
 
         try {
-            const res = await fetch(url, { headers: { "Authorization": `token ${GITHUB_TOKEN}` } });
-            const fileData = await res.json();
-            
-            // قراءة البيانات الحالية
-            let currentContent = JSON.parse(decodeURIComponent(escape(atob(fileData.content))));
-            
-            // إضافة التطبيق الجديد
-            currentContent.push({ name, desc, icon, plist });
-
-            // رفع التحديث
-            const update = await fetch(url, {
+            // رفع ملف الـ Plist الجديد
+            await fetch(`https://api.github.com/repos/${USER}/${REPO}/contents/${plistName}`, {
                 method: "PUT",
-                headers: { "Authorization": `token ${GITHUB_TOKEN}`, "Content-Type": "application/json" },
+                headers: { "Authorization": `token ${TOKEN}` },
                 body: JSON.stringify({
-                    message: `إضافة ${name}`,
-                    content: btoa(unescape(encodeURIComponent(JSON.stringify(currentContent, null, 2)))),
+                    message: `إنشاء ملف Plist لـ ${name}`,
+                    content: btoa(unescape(encodeURIComponent(plistContent)))
+                })
+            });
+
+            log.innerText = "⏳ جاري تحديث قائمة المتجر...";
+
+            // تحديث ملف apps.json
+            const res = await fetch(`https://api.github.com/repos/${USER}/${REPO}/contents/apps.json`, {
+                headers: { "Authorization": `token ${TOKEN}` }
+            });
+            const fileData = await res.json();
+            let apps = JSON.parse(decodeURIComponent(escape(atob(fileData.content))));
+            
+            apps.push({ name, desc: "تثبيت مباشر بملف Plist", icon, plist: plistURL });
+
+            await fetch(`https://api.github.com/repos/${USER}/${REPO}/contents/apps.json`, {
+                method: "PUT",
+                headers: { "Authorization": `token ${TOKEN}` },
+                body: JSON.stringify({
+                    message: `إضافة ${name} للمتجر`,
+                    content: btoa(unescape(encodeURIComponent(JSON.stringify(apps, null, 2)))),
                     sha: fileData.sha
                 })
             });
 
-            if(update.ok) {
-                status.innerHTML = "<b style='color:#64ffda'>✅ تم النشر! حدث المتجر الآن.</b>";
-                document.querySelectorAll('input').forEach(i => i.value = "");
-            } else {
-                status.innerText = "❌ خطأ في النشر، تأكد من الإعدادات.";
-            }
-        } catch (e) {
-            status.innerText = "خطأ: " + e.message;
-        }
+            log.innerHTML = "<b style='color:#64ffda'>✅ مبروك! التطبيق جاهز للتثبيت الآن.</b>";
+        } catch (e) { log.innerText = "خطأ: " + e.message; }
     }
 </script>
 </body>
