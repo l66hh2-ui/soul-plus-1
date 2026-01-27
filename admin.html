@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>لوحة التحكم - SOUL</title>
+    <style>
+        body { background: #0a192f; color: white; font-family: sans-serif; padding: 20px; text-align: center; }
+        .form-box { background: #112240; padding: 20px; border-radius: 15px; max-width: 400px; margin: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #233554; background: #0a192f; color: white; }
+        button { background: #64ffda; color: #0a192f; padding: 12px 30px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 95%; }
+    </style>
+</head>
+<body>
+    <h1>إضافة تطبيق جديد</h1>
+    <div class="form-box">
+        <input type="password" id="token" placeholder="أدخل الـ Token الخاص بك">
+        <hr>
+        <input type="text" id="name" placeholder="اسم التطبيق">
+        <input type="text" id="desc" placeholder="وصف قصير">
+        <input type="text" id="icon" placeholder="رابط الأيقونة">
+        <input type="text" id="plist" placeholder="رابط ملف الـ Plist">
+        <button onclick="addApp()">إضافة التطبيق للمتجر فوراً</button>
+        <p id="status"></p>
+    </div>
+
+    <script>
+        async function addApp() {
+            const token = document.getElementById('token').value;
+            const newApp = {
+                name: document.getElementById('name').value,
+                desc: document.getElementById('desc').value,
+                icon: document.getElementById('icon').value,
+                plist: document.getElementById('plist').value
+            };
+
+            const status = document.getElementById('status');
+            status.innerText = "جاري الإضافة...";
+
+            // هنا نحدد ملف البيانات اللي بيقراه المتجر
+            const url = "https://api.github.com/repos/l66hh2-ui/soul-plus-1/contents/apps.json";
+
+            try {
+                // 1. نجيب الملف الحالي
+                const res = await fetch(url);
+                const fileData = await res.json();
+                let currentApps = JSON.parse(atob(fileData.content));
+
+                // 2. نضيف التطبيق الجديد
+                currentApps.push(newApp);
+
+                // 3. نرفع الملف المحدث لـ GitHub
+                const update = await fetch(url, {
+                    method: "PUT",
+                    headers: { "Authorization": `token ${token}`, "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        message: "إضافة تطبيق جديد عبر لوحة التحكم",
+                        content: btoa(unescape(encodeURIComponent(JSON.stringify(currentApps, null, 2)))),
+                        sha: fileData.sha
+                    })
+                });
+
+                if(update.ok) status.innerText = "✅ تم الإضافة بنجاح! حدث المتجر الآن.";
+                else status.innerText = "❌ فشل الإضافة، تأكد من الـ Token.";
+            } catch (e) {
+                status.innerText = "Error: " + e.message;
+            }
+        }
+    </script>
+</body>
+</html>
