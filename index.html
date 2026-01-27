@@ -3,41 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOUL PLUS STORE</title>
+    <title>SOUL PLUS - AUTO SOURCE</title>
     <style>
-        body { background: #0a192f; color: white; font-family: -apple-system, sans-serif; text-align: center; padding: 20px; }
-        .app-card { background: #112240; padding: 15px; border-radius: 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; border: 1px solid #233554; }
-        .btn { background: #64ffda; color: #0a192f; padding: 12px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; border: none; font-size: 14px; }
+        :root { --bg: #0a192f; --card: #112240; --accent: #64ffda; }
+        body { background: var(--bg); color: white; font-family: sans-serif; text-align: center; padding: 20px; }
+        .app-card { background: var(--card); border-radius: 15px; padding: 15px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border: 1px solid #233554; }
+        .btn { background: var(--accent); color: #0a192f; padding: 10px 20px; border-radius: 20px; font-weight: bold; text-decoration: none; font-size: 13px; }
+        #status { color: var(--accent); font-size: 14px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
-    <h2>متجر SOUL PLUS</h2>
-    <div id="list">جاري تحميل التطبيقات...</div>
+
+    <h1>متجر SOUL PLUS المطور</h1>
+    <div id="status">⏳ جاري فحص الشهادات وجلب التطبيقات...</div>
+    <div id="list"></div>
 
     <script>
-        async function load() {
+        // مصفوفة المصادر العالمية الموقعة
+        const sources = [
+            "https://api.allorigins.win/get?url=" + encodeURIComponent("https://raw.githubusercontent.com/swaggyP1/P1-Repo/main/apps.json")
+        ];
+
+        async function fetchApps() {
+            const list = document.getElementById('list');
             try {
-                const r = await fetch('apps.json?v=' + Math.random());
-                const data = await r.json();
-                const list = document.getElementById('list');
-                list.innerHTML = data.map(app => `
+                const response = await fetch(sources[0]);
+                const data = await response.json();
+                const content = JSON.parse(data.contents);
+                
+                document.getElementById('status').innerText = "✅ تم تحديث الشهادات بنجاح";
+                
+                list.innerHTML = content.map(app => `
                     <div class="app-card">
                         <div style="display:flex; align-items:center; gap:12px;">
-                            <img src="${app.icon}" width="55" style="border-radius:12px;">
-                            <div style="text-align:right"><b>${app.name}</b></div>
+                            <img src="${app.icon}" width="50" style="border-radius:10px;" onerror="this.src='soul-icon.png'">
+                            <div style="text-align:right">
+                                <b>${app.name}</b><br>
+                                <small style="color:#8892b0">نسخة موقعة جاهزة</small>
+                            </div>
                         </div>
-                        <button onclick="install('${app.plist}')" class="btn">تثبيت</button>
+                        <a href="itms-services://?action=download-manifest&url=${app.plist}" class="btn">تثبيت</a>
                     </div>
                 `).join('');
-            } catch (e) { document.getElementById('list').innerHTML = "تأكد من ملف apps.json"; }
+            } catch (e) {
+                document.getElementById('status').innerText = "❌ فشل التحديث التلقائي، جرب لاحقاً";
+            }
         }
-
-        function install(url) {
-            // تنبيه للتأكد أن الزر استجاب
-            alert("انتظر قليلاً.. ستظهر رسالة التثبيت الآن");
-            window.location.href = "itms-services://?action=download-manifest&url=" + url;
-        }
-        load();
+        fetchApps();
     </script>
 </body>
 </html>
