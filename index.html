@@ -3,42 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOUL PLUS STORE</title>
+    <title>SOUL PLUS | متجر سول بلس المطور</title>
     <style>
-        body { background: #0a192f; color: white; font-family: -apple-system, sans-serif; text-align: center; padding: 20px; }
-        .app-card { background: #112240; padding: 15px; border-radius: 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; border: 1px solid #233554; }
-        .btn { background: #64ffda; color: #0a192f; padding: 12px 20px; border-radius: 20px; font-weight: bold; text-decoration: none; font-size: 14px; cursor: pointer; border: none; }
-        #list { max-width: 500px; margin: auto; }
+        :root { --bg: #0b0e14; --card: #1a1f29; --accent: #30cfd0; --text: #ffffff; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 15px; }
+        .header { text-align: center; padding: 30px 0; background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); border-radius: 0 0 30px 30px; margin: -15px -15px 25px -15px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .search-bar { width: 90%; max-width: 500px; padding: 12px 20px; border-radius: 25px; border: none; background: var(--card); color: white; margin: -25px auto 20px auto; display: block; box-shadow: 0 5px 15px rgba(0,0,0,0.2); outline: none; border: 1px solid var(--accent); }
+        .app-list { display: grid; gap: 12px; max-width: 600px; margin: auto; }
+        .app-card { background: var(--card); padding: 12px; border-radius: 18px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #2a2f3a; animation: fadeIn 0.5s ease; }
+        .app-info { display: flex; align-items: center; gap: 12px; text-align: right; }
+        .app-icon { width: 55px; height: 55px; border-radius: 12px; background: #2a2f3a; }
+        .app-name { font-weight: bold; font-size: 15px; display: block; }
+        .app-ver { font-size: 11px; color: #8892b0; }
+        .install-btn { background: var(--accent); color: #000; padding: 8px 18px; border-radius: 20px; font-weight: bold; text-decoration: none; font-size: 13px; border: none; cursor: pointer; }
+        .tg-section { margin-top: 40px; border-top: 1px solid #2a2f3a; padding: 20px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
-    <h1>متجر SOUL PLUS</h1>
-    <div id="list">⏳ جاري عرض التطبيقات...</div>
 
-    <script>
-        // مصفوفة تطبيقات بلس روابطها شغالة حالياً
-        const myApps = [
-            { "name": "Scarlet", "icon": "https://usescarlet.com/apple-touch-icon.png", "plist": "https://usescarlet.com/install.plist" },
-            { "name": "ESign", "icon": "https://esign.yyyue.xyz/ESign.png", "plist": "https://esign.yyyue.xyz/install.plist" },
-            { "name": "يوتيوب بلس", "icon": "https://upload.wikimedia.org/wikipedia/commons/ef/ef/Youtube_logo.png", "plist": "https://raw.githubusercontent.com/swaggyP1/P1-Repo/main/plists/youtube.plist" },
-            { "name": "سناب شات بلس", "icon": "https://upload.wikimedia.org/wikipedia/en/thumb/c/c4/Snapchat_logo.svg/512px-Snapchat_logo.svg.png", "plist": "https://raw.githubusercontent.com/mshaly/App-Store-Template/master/assets/plists/snapchat.plist" }
-        ];
+<div class="header">
+    <h1 style="margin:0;">SOUL PLUS</h1>
+    <p style="font-size: 13px; opacity: 0.8;">تحكم من التلجرام ومصادر عالمية</p>
+</div>
 
-        function showApps() {
-            const list = document.getElementById('list');
-            list.innerHTML = myApps.map(app => `
-                <div class="app-card">
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <img src="${app.icon}" width="55" style="border-radius:12px;" onerror="this.src='soul-icon.png'">
-                        <div style="text-align:right"><b>${app.name}</b></div>
-                    </div>
-                    <button onclick="window.location.href='itms-services://?action=download-manifest&url=${app.plist}'" class="btn">تثبيت</button>
-                </div>
-            `).join('');
+<input type="text" id="search" class="search-bar" placeholder="ابحث عن تطبيق (سناب، يوتيوب...)" oninput="filterApps()">
+
+<div id="status" style="text-align:center; font-size:12px; color:var(--accent); margin-bottom:10px;">جاري فحص المصادر العالمية...</div>
+<div id="app-list" class="app-list"></div>
+
+<div class="tg-section">
+    <h3 style="text-align:center; color: var(--accent);">📢 من قناة التلجرام</h3>
+    <div id="tg-apps" class="app-list"></div>
+    <div style="margin-top:20px; border-radius:15px; overflow:hidden;">
+        <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="soul_plus9/2" data-width="100%" data-userpic="true" data-dark="1"></script>
+    </div>
+</div>
+
+<script>
+    // بعض الروابط اللي أرسلتها (حطيت عينة منها لسرعة التحميل)
+    const sources = [
+        "https://raw.githubusercontent.com/swaggyP36000/TrollStore-IPAs/main/apps.json",
+        "https://qnblackcat.github.io/AltStore/apps.json",
+        "https://esign.yyyue.xyz/app.json",
+        "https://wuxu1.github.io/wuxu-complete.json"
+    ];
+
+    let allApps = [];
+
+    // 1. جلب التطبيقات من المصادر العالمية
+    async function loadGlobal() {
+        for (let url of sources) {
+            try {
+                const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+                const data = await res.json();
+                const json = JSON.parse(data.contents);
+                const apps = json.apps || json.applications || [];
+                
+                apps.forEach(a => {
+                    allApps.push({
+                        name: a.name,
+                        icon: a.iconUrl || a.icon || 'https://via.placeholder.com/100',
+                        plist: a.downloadURL || a.ipaUrl,
+                        ver: a.version || 'Global'
+                    });
+                });
+                renderApps(allApps);
+            } catch (e) { console.log("Skip source"); }
         }
-        
-        // تشغيل العرض فوراً
-        showApps();
-    </script>
+        document.getElementById('status').innerText = `✅ متصل بـ ${allApps.length} تطبيق عالمي`;
+    }
+
+    // 2. سحب التحكم من قناة تلجرام soul_plus9
+    async function loadTelegram() {
+        try {
+            const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://t.me/s/soul_plus9')}`);
+            const data = await res.json();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(data.contents, 'text/html');
+            const messages = doc.querySelectorAll('.tgme_widget_message_text');
+            const tgList = document.getElementById('tg-apps');
+            
+            messages.forEach(msg => {
+                const text = msg.innerText;
+                const plist = text.match(/https?:\/\/[^\s]+\.plist/g);
+                if (plist) {
+                    const name = text.split('\n')[0];
+                    tgList.innerHTML += `
+                        <div class="app-card" style="border-right: 4px solid #0088cc;">
+                            <div class="app-info">
+                                <img src="https://t.me/i/userpic/320/soul_plus9.jpg" class="app-icon">
+                                <div><span class="app-name">${name}</span><span class="app-ver">تحديث تلجرام</span></div>
+                            </div>
+                            <button onclick="install('${plist[0]}')" class="install-btn">تثبيت</button>
+                        </div>`;
+                }
+            });
+        } catch (e) { console.log("TG Error"); }
+    }
+
+    function renderApps(data) {
+        const list = document.getElementById('app-list');
+        list.innerHTML = data.map(app => `
+            <div class="app-card">
+                <div class="app-info">
+                    <img src="${app.icon}" class="app-icon" onerror="this.src='https://via.placeholder.com/100'">
+                    <div><span class="app-name">${app.name}</span><span class="app-ver">${app.ver}</span></div>
+                </div>
+                <button onclick="install('${app.plist}')" class="install-btn">تثبيت</button>
+            </div>
+        `).join('');
+    }
+
+    function filterApps() {
+        const term = document.getElementById('search').value.toLowerCase();
+        const filtered = allApps.filter(a => a.name.toLowerCase().includes(term));
+        renderApps(filtered);
+    }
+
+    function install(url) {
+        window.location.href = "itms-services://?action=download-manifest&url=" + url;
+    }
+
+    loadGlobal();
+    loadTelegram();
+</script>
 </body>
 </html>
