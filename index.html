@@ -3,100 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOUL PLUS STORE</title>
+    <title>SOUL PLUS | المحول الذكي</title>
     <style>
-        :root { --bg: #0d1117; --card: #161b22; --accent: #58a6ff; --text: #c9d1d9; }
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 15px; text-align: center; }
-        .header { padding: 30px 10px; background: linear-gradient(180deg, #1f6feb 0%, #0d1117 100%); border-radius: 0 0 25px 25px; margin: -15px -15px 20px -15px; }
-        .search-bar { width: 90%; max-width: 450px; padding: 12px; border-radius: 12px; border: 1px solid #30363d; background: var(--card); color: white; margin-bottom: 20px; outline: none; }
-        .app-list { display: grid; gap: 10px; max-width: 500px; margin: auto; }
-        .app-card { background: var(--card); padding: 12px; border-radius: 15px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #30363d; }
-        .app-info { display: flex; align-items: center; gap: 12px; text-align: right; }
-        .app-icon { width: 50px; height: 50px; border-radius: 10px; background: #30363d; }
-        .install-btn { background: #238636; color: white; padding: 8px 16px; border-radius: 10px; font-weight: bold; text-decoration: none; border: none; cursor: pointer; }
-        .tg-btn { display: block; margin: 20px auto; color: var(--accent); text-decoration: none; font-size: 14px; }
+        :root { --primary: #00d2ff; --bg: #0f172a; --card: #1e293b; }
+        body { background: var(--bg); color: white; font-family: -apple-system, sans-serif; text-align: center; margin: 0; padding: 20px; }
+        .app-card { background: var(--card); padding: 15px; border-radius: 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; border: 1px solid #334155; }
+        .app-icon { width: 50px; height: 50px; border-radius: 12px; margin-left: 10px; }
+        .install-btn { background: linear-gradient(to right, #00d2ff, #3a7bd5); color: white; border: none; padding: 10px 20px; border-radius: 15px; font-weight: bold; cursor: pointer; }
+        .search { width: 100%; padding: 12px; border-radius: 15px; border: none; margin-bottom: 20px; background: #334155; color: white; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h1 style="margin:0; color:white;">SOUL PLUS</h1>
-    <p style="font-size:12px; opacity:0.8;">المتجر العالمي المفتوح</p>
-</div>
-
-<input type="text" id="search" class="search-bar" placeholder="ابحث في 10 مستودعات عالمية..." oninput="filterApps()">
-
-<div id="loader" style="font-size:12px; color:var(--accent);">⏳ جاري فحص الشهادات...</div>
-<div id="app-list" class="app-list"></div>
-
-<a href="https://t.me/soul_plus9" class="tg-btn">📢 تابع التحديثات على تلجرام</a>
+    <h1 style="color: var(--primary);">SOUL PLUS</h1>
+    <input type="text" id="search" class="search" placeholder="ابحث عن تطبيق..." oninput="search()">
+    
+    <div id="status" style="font-size: 12px; margin-bottom: 10px; color: #94a3b8;">جاري فحص المصادر...</div>
+    <div id="list"></div>
 
 <script>
-    // أفضل 10 مصادر من قائمتك (التي تدعم الجلب المباشر)
     const sources = [
         "https://ipa.cypwn.xyz/cypwn.json",
         "https://wuxu1.github.io/wuxu-complete.json",
-        "https://qnblackcat.github.io/AltStore/apps.json",
         "https://esign.yyyue.xyz/app.json",
-        "https://raw.githubusercontent.com/swaggyP36000/TrollStore-IPAs/main/apps.json",
-        "https://raw.githubusercontent.com/Balackburn/YTLitePlusAltstore/main/apps.json",
-        "https://raw.githubusercontent.com/LiveContainer/LiveContainer/refs/heads/main/apps.json",
-        "https://randomblock1.com/altstore/apps.json",
-        "https://raw.githubusercontent.com/vizunchik/AltStoreRus/master/apps.json",
-        "https://therealfoxster.github.io/altsource/apps.json"
+        "https://raw.githubusercontent.com/swaggyP36000/TrollStore-IPAs/main/apps.json"
     ];
 
     let allApps = [];
 
-    async function loadApps() {
+    async function getApps() {
         for (let url of sources) {
             try {
                 const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
                 const data = await res.json();
                 const json = JSON.parse(data.contents);
                 const apps = json.apps || json.applications || [];
-                
                 apps.forEach(a => {
                     allApps.push({
                         name: a.name,
-                        icon: a.iconUrl || a.icon || 'https://via.placeholder.com/100',
-                        plist: a.downloadURL || a.ipaUrl,
-                        ver: a.version || 'Global'
+                        icon: a.iconUrl || a.icon,
+                        url: a.downloadURL || a.ipaUrl || a.ipaURL,
+                        bundle: a.bundleIdentifier || "com.soul.app"
                     });
                 });
                 render(allApps);
-            } catch (e) { console.log("Skip"); }
+            } catch (e) { console.log("خطأ في مصدر"); }
         }
-        document.getElementById('loader').innerText = `✅ تم جلب ${allApps.length} تطبيق بنجاح`;
+        document.getElementById('status').innerText = "✅ المتجر جاهز للاستخدام";
     }
 
-    function render(data) {
-        const list = document.getElementById('app-list');
-        list.innerHTML = data.map(app => `
+    function render(apps) {
+        const container = document.getElementById('list');
+        container.innerHTML = apps.map(app => `
             <div class="app-card">
-                <div class="app-info">
+                <div style="display:flex; align-items:center;">
                     <img src="${app.icon}" class="app-icon" onerror="this.src='https://via.placeholder.com/100'">
-                    <div>
-                        <span style="display:block; font-weight:bold;">${app.name}</span>
-                        <span style="font-size:10px; color:#8b949e;">إصدار: ${app.ver}</span>
-                    </div>
+                    <span style="font-weight:bold;">${app.name}</span>
                 </div>
-                <button onclick="install('${app.plist}')" class="install-btn">تثبيت</button>
+                <button class="install-btn" onclick="smartInstall('${app.url}', '${app.name}', '${app.bundle}')">تثبيت</button>
             </div>
         `).join('');
     }
 
-    function filterApps() {
-        const term = document.getElementById('search').value.toLowerCase();
-        render(allApps.filter(a => a.name.toLowerCase().includes(term)));
+    // الدالة السحرية: تحويل الـ IPA إلى Plist فوراً
+    function smartInstall(url, name, bundle) {
+        if (!url) return alert("الرابط غير صالح");
+
+        // إذا كان الرابط IPA، نستخدم محول خارجي سريع وموثوق
+        if (url.includes('.ipa')) {
+            const plistGenerator = `https://api.isign.cloud/plist?url=${encodeURIComponent(url)}&name=${encodeURIComponent(name)}&bundle=${bundle}`;
+            window.location.href = `itms-services://?action=download-manifest&url=${plistGenerator}`;
+        } 
+        // إذا كان Plist جاهز، نفتحه مباشرة
+        else if (url.includes('.plist')) {
+            window.location.href = `itms-services://?action=download-manifest&url=${url}`;
+        }
+        else {
+            // إذا كان رابط صفحة، نفتحه
+            window.open(url, '_blank');
+        }
     }
 
-    function install(url) {
-        if(!url) return alert("الرابط غير متوفر حالياً");
-        window.location.href = "itms-services://?action=download-manifest&url=" + url;
+    function search() {
+        const query = document.getElementById('search').value.toLowerCase();
+        const filtered = allApps.filter(a => a.name.toLowerCase().includes(query));
+        render(filtered);
     }
 
-    loadApps();
+    getApps();
 </script>
 </body>
 </html>
